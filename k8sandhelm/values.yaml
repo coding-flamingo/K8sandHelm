@@ -12,7 +12,7 @@ container:
   frontEndImage: codingflamingo.azurecr.io/k8sfrontend
   backEndImage: codingflamingo.azurecr.io/k8sbackend
   namespace: devcodingflamingo 
-  frontEndTag: v1
+  frontEndTag: v2
   backEndTag: v1
   frontEndport: 80
   frontEndServiceport: 9778
@@ -21,6 +21,11 @@ container:
 frontEndreplicas: 2
 backEndreplicas: 3
 
+certificate:
+  appdnsname: flamingo.westus2.cloudapp.azure.com
+  certtype: letsencrypt-staging
+  email: codingflamingo@gmail.com
+  certserver: https://acme-staging-v02.api.letsencrypt.org/directory
 service:
   port: 8888
   type: ClusterIP

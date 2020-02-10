@@ -4,7 +4,7 @@ az acr login --name $acrName
 
 cd K8sFrontEnd
 docker image build -t  k8sfrontend .
-docker tag k8sfrontend "$($acrName).azurecr.io/k8sfrontend:v1"
+docker tag k8sfrontend "$($acrName).azurecr.io/k8sfrontend:v2"
 docker push "$($acrName).azurecr.io/k8sfrontend"
 cd ..
 

@@ -1,0 +1,17 @@
+﻿@page "/counter"
+@using K8sFrontEnd.Services
+@inject HTTPReqService _httpService
+
+<h1>Counter</h1>
+
+<p>Current Message: @returnedstring</p>
+
+<button class="btn btn-primary" @onclick="CallBackendAsync">Click me</button>
+
+@code {
+    private string returnedstring = "click button to call backend";
+    private async Task CallBackendAsync()
+    {
+        returnedstring = await _httpService.CallApiAsync("http://k8sbackend-service:9368/WeatherForecast");
+    }
+}

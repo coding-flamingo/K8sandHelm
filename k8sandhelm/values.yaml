@@ -1,0 +1,26 @@
+environment: development
+
+apphost: k8s
+
+label:
+  name: helmtutorial
+
+container:
+  frontEndName: k8sfrontend
+  backEndName: k8sbackend
+  pullPolicy: IfNotPresent
+  frontEndImage: codingflamingo.azurecr.io/k8sfrontend
+  backEndImage: codingflamingo.azurecr.io/k8sbackend
+  namespace: devcodingflamingo 
+  frontEndTag: v1
+  backEndTag: v1
+  frontEndport: 80
+  frontEndServiceport: 9778
+  backEndport: 80
+  backEndServiceport: 9368
+frontEndreplicas: 2
+backEndreplicas: 3
+
+service:
+  port: 8888
+  type: ClusterIP

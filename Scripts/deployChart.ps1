@@ -1,9 +1,9 @@
 #kubectl create namespace devcodingflamingo
+helm delete firstdeployment1dev
 
 helm install firstdeployment1dev .\k8sandhelm 
-kubectl get pods -n devcodingflamingo
+kubectl get pods -n devcodingflamingo 
 
-helm delete firstdeployment1dev
 
 #deploy ingress
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/

@@ -1,6 +1,6 @@
 using System;
 
-namespace K8sFrontEnd.Data
+namespace K8sFrontEnd.Models
 {
     public class WeatherForecast
     {

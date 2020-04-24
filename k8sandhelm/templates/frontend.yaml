@@ -16,6 +16,9 @@ spec:
       labels:
         app: {{ .Values.container.frontEndName }}
         environment: {{ .Values.environment }}
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: "frontend"
     spec:
       containers:
         - name: {{ .Values.container.frontEndName }}

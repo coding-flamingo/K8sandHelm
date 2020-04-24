@@ -9,17 +9,17 @@ container:
   frontEndName: k8sfrontend
   backEndName: k8sbackend
   pullPolicy: IfNotPresent
-  frontEndImage: codingflamingo.azurecr.io/k8sfrontend
-  backEndImage: codingflamingo.azurecr.io/k8sbackend
+  frontEndImage: codingflamingoacr.azurecr.io/k8sfrontend
+  backEndImage: codingflamingoacr.azurecr.io/k8sbackend
   namespace: devcodingflamingo 
-  frontEndTag: v2
-  backEndTag: v1
+  frontEndTag: v7
+  backEndTag: v3
   frontEndport: 80
   frontEndServiceport: 9778
   backEndport: 80
   backEndServiceport: 9368
-frontEndreplicas: 2
-backEndreplicas: 3
+frontEndreplicas: 1
+backEndreplicas: 1
 
 certificate:
   appdnsname: flamingo.westus2.cloudapp.azure.com

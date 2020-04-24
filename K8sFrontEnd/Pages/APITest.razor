@@ -1,0 +1,241 @@
+﻿@page "/apitest"
+@using K8sFrontEnd.Services
+@using System.Diagnostics
+@using System.Collections.Generic
+@using System.Threading.Tasks
+@using Dapr.Client
+@using Newtonsoft.Json
+@inject HTTPReqService _httpService
+
+<h1>API Test</h1>
+<h2>Set Payload Size</h2>
+<div>
+    <label>Payload Size:</label>
+    <input type="range" @bind="payloadSize" min="1" max="50" step="1" />
+    <span class="size-label">
+        @(payloadSize) KB
+    </span>
+</div>
+
+<h2>Average Time per Call for 1000 Calls</h2>
+<button class="btn btn-primary" @onclick="Call1000Times">1000 Time Average</button>
+<br>
+@if(avgREST.Equals("loading") || avgdaprREST.Equals("loading") || avggRPC.Equals("loading"))
+{
+    <br>
+    <Fold />
+    <br>
+}
+else
+{
+    <br>
+    <p>GET REST API avg Time: @avgREST ms</p>
+    <p>GET Dapr REST API avg Time: @avgdaprREST ms</p>
+    <p>GET Dapr gRPC avg Time: @avggRPC ms</p>
+}
+<br>
+<h2>Total Time for 500 Parallel Calls</h2>
+<button class="btn btn-primary" @onclick="daprRestGet500Parallel">dapr REST Parallel</button>
+<br>
+@if(daprRESTParallel.Equals("loading"))
+{
+    <br>
+    <Wave />
+    <br>
+}
+else
+{
+    <br>
+    <p>GET Dapr REST API parallel Time: @daprRESTParallel ms</p>
+}
+<button class="btn btn-primary" @onclick="daprgRPCGet500Parallel">dapr gRPC Parallel</button>
+    <br>
+@if(daprgRPCParallel.Equals("loading"))
+{
+    <br>
+    <Flow />
+    <br>
+}
+else
+{
+    <br>
+    <p>GET Dapr gRPC parallel Time: @daprgRPCParallel ms</p>
+}
+
+<button class="btn btn-primary" @onclick="CallAllAsync">Test APIs</button>
+<h2>Single REST API Call</h2>
+
+<p> GET REST API Backend: @returnedstring</p>
+<p>Request Time: @restAPItime ms</p>
+
+<h2>GET REST API dapr Backend</h2>
+
+<p>Dapr: @daprreturnedstring</p>
+<p>Request Time: @daprtime ms</p>
+
+<h2>GET gRPC dapr Backend</h2>
+
+<p>Dapr gRPC: @daprgRPCstring</p>
+<p>Request Time: @daprgRPCtime ms</p>
+
+
+@code {
+    private string returnedstring = "click button to call backend";
+    private string restAPItime = "0";
+    private string daprreturnedstring = "click button to call backend";
+    private string daprgRPCstring = "click button to call backend";
+    private string daprgRPCtime = "0";
+    private string daprtime = "0";
+    private string avggRPC = "0";
+    private string avgdaprREST = "0";
+    private string avgREST = "0";
+    private string avggRPCPost = "0";
+    private string daprRESTParallel = "0";
+    private string daprgRPCParallel = "0";
+    private IEnumerable<WeatherForecast> forecast;
+    private IEnumerable<WeatherForecast> postForecast;
+    private DaprClient client;
+    private int payloadSize;
+
+    protected override void OnInitialized()
+    {
+        client = new DaprClientBuilder().Build();
+        postForecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(index),
+                TemperatureC = 55,
+                Summary = "test sum"
+            }).ToArray(); 
+    }
+
+    private async Task CallBackendAsync()
+    {
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+        returnedstring = await _httpService.CallGetApiAsync("http://k8sbackend-service:9368/WeatherForecast?results=" + payloadSize.ToString());
+        var test = JsonConvert.DeserializeObject<IEnumerable<WeatherForecast>>(returnedstring);
+        watch.Stop();
+        restAPItime = watch.Elapsed.TotalMilliseconds.ToString();
+    }
+
+    private async Task CallDaprBackendAsync()
+    {
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+        daprreturnedstring = await _httpService.CallGetPollylessAsync("http://localhost:3500/v1.0/invoke/k8sbackend/method/WeatherForecast?results=" + payloadSize.ToString());
+        var test = JsonConvert.DeserializeObject<IEnumerable<WeatherForecast>>(daprreturnedstring);   //added to match the timing of th gRPC that does thsi     
+        watch.Stop();
+        daprtime = watch.Elapsed.TotalMilliseconds.ToString();
+    }
+
+    private async Task CallDaprBackendgRPCAsync()
+    {
+        // Add the verb to metadata if the method is other than a POST
+        var metaData = new Dictionary<string, string>();
+        metaData.Add("http.verb", "GET");
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+        forecast = await client.InvokeMethodAsync<IEnumerable<WeatherForecast>>("k8sbackend", "WeatherForecast?results=" + payloadSize.ToString(), metaData);
+        watch.Stop();
+        daprgRPCstring = JsonConvert.SerializeObject(forecast);
+        daprgRPCtime = watch.Elapsed.TotalMilliseconds.ToString();
+    }
+    private async Task CallAllAsync()
+    {
+        await CallBackendAsync();
+        await CallDaprBackendAsync();
+        await CallDaprBackendgRPCAsync();
+    }
+    private async Task Call1000Times()
+    {        
+        await RegularRestGet100();
+        await daprRestGet1000();
+        await daprgRPCGet1000();
+    }
+
+    
+    private async Task RegularRestGet100()
+    {
+        string tempresult;
+        IEnumerable<WeatherForecast> tempval;
+        avgREST = "loading";
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+        for(int i = 0; i < 1000; i++)
+        {
+            tempresult = await _httpService.CallGetApiAsync("http://k8sbackend-service:9368/WeatherForecast?results=" + payloadSize.ToString());
+            tempval = JsonConvert.DeserializeObject<IEnumerable<WeatherForecast>>(tempresult);
+        }
+        watch.Stop();
+        avgREST = (watch.Elapsed.TotalMilliseconds / 1000).ToString();
+    }
+
+    private async Task daprRestGet1000()
+    {  
+        string tempresult;
+        IEnumerable<WeatherForecast> tempval;
+        avgdaprREST = "loading";
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+        for(int i = 0; i < 1000; i++)
+        {
+            tempresult = await _httpService.CallGetPollylessAsync("http://localhost:3500/v1.0/invoke/k8sbackend/method/WeatherForecast?results=" + payloadSize.ToString());
+            tempval = JsonConvert.DeserializeObject<IEnumerable<WeatherForecast>>(tempresult);
+        }
+        watch.Stop();
+        avgdaprREST = (watch.Elapsed.TotalMilliseconds / 1000).ToString();        
+    }
+
+    private async Task daprRestGet500Parallel()
+    {  
+        List<Task> TaskList = new List<Task>();
+        Task t;
+        daprRESTParallel = "loading";
+        Stopwatch watch = new Stopwatch();
+        for(int i = 0; i < 500; i++)
+        {
+            t =  _httpService.CallGetPollylessAsync("http://localhost:3500/v1.0/invoke/k8sbackend/method/WeatherForecast?results=" + payloadSize.ToString());
+            TaskList.Add(t);
+        }
+        watch.Start();
+        await Task.WhenAll(TaskList);
+        watch.Stop();
+        daprRESTParallel = watch.Elapsed.TotalMilliseconds.ToString();        
+    }   
+
+    private async Task daprgRPCGet1000()
+    {
+        var metaData = new Dictionary<string, string>();
+        metaData.Add("http.verb", "GET");
+        IEnumerable<WeatherForecast> tempval;
+        avggRPC = "loading";
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+        for(int i = 0; i < 1000; i++)
+        {
+            tempval = await client.InvokeMethodAsync<IEnumerable<WeatherForecast>>("k8sbackend", "WeatherForecast?results=" + payloadSize.ToString(), metaData);
+        }
+        watch.Stop();
+        avggRPC = (watch.Elapsed.TotalMilliseconds / 1000).ToString();
+    }
+
+    private async Task daprgRPCGet500Parallel()
+    {
+        List<Task<IEnumerable<WeatherForecast>>> TaskList = new List<Task<IEnumerable<WeatherForecast>>>();
+        Task<IEnumerable<WeatherForecast>> t;
+        var metaData = new Dictionary<string, string>();
+        metaData.Add("http.verb", "GET");
+        daprgRPCParallel = "loading";
+        Stopwatch watch = new Stopwatch();
+        for(int i = 0; i < 500; i++)
+        {
+            t =  client.InvokeMethodAsync<IEnumerable<WeatherForecast>>("k8sbackend", "WeatherForecast?results=" + payloadSize.ToString(), metaData).AsTask();
+            TaskList.Add(t);
+        }
+        watch.Start();
+        IEnumerable<WeatherForecast>[] results = await Task.WhenAll(TaskList);
+        watch.Stop();
+        daprgRPCParallel = watch.Elapsed.TotalMilliseconds.ToString();
+    }
+
+}

@@ -16,6 +16,10 @@ spec:
       labels:
         app: {{ .Values.container.backEndName }}
         environment: {{ .Values.environment }}
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: {{ .Values.container.backEndName }}
+        dapr.io/port: "80"
     spec:
       containers:
         - name: {{ .Values.container.backEndName }}

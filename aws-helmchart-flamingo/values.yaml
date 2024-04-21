@@ -1,0 +1,18 @@
+sampleapp:
+  replicas: 2
+  image: public.ecr.aws/kishorj/docker-2048:latest
+  cpu: .3
+  memory: .5G
+  port: 80
+  name: sampleapp
+  frontEndportServicePort: 37000
+    
+
+ 
+namespace: sampleapp
+
+certificate:
+  appDNSName: "test1.codingflamingo.com"
+  certType: "letsencrypt-prod"
+  certificateName: "tls-secret-sampleapp"
+  ingressClass: "nginx"

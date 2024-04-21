@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.sampleapp.name }}-{{ .Release.Name }}-{{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.sampleapp.replicas }} # Adjust the replica count as needed
+  selector:
+    matchLabels:
+      app: sampleapp
+  template:
+    metadata:
+      labels:
+        app: sampleapp
+    spec:
+      containers:
+      - name: sampleapp
+        image: {{ .Values.sampleapp.image }}
+        ports:
+        - containerPort: {{ .Values.sampleapp.port }}
+        resources:
+          requests:
+            memory: {{ .Values.sampleapp.memory }}
+            cpu: {{ .Values.sampleapp.cpu }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.sampleapp.name }}-service
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.sampleapp.frontEndportServicePort }}
+    targetPort: {{ .Values.sampleapp.port }}
+    protocol: TCP
+  selector:
+    app: sampleapp
+

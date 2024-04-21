@@ -1,0 +1,9 @@
+namespace: sampleapp
+
+certificate:
+  appDNSName: "test1.codingflamingo.com"
+  certType: "letsencrypt-prod"
+  certificateName: "tls-secret-sampleapp"
+  ingressClass: "nginx"
+  email: "codingflamingo@gmail.com"
+  certServer: "https://acme-v02.api.letsencrypt.org/directory"

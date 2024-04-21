@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8sBackEnd", "K8sBackEnd\K8sBackEnd.csproj", "{397C7C4D-BDDE-4689-BE5D-A59713B86567}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8sFrontEnd", "K8sFrontEnd\K8sFrontEnd.csproj", "{F7B1343E-A259-46C5-81B5-41D431D12D3D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{397C7C4D-BDDE-4689-BE5D-A59713B86567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{397C7C4D-BDDE-4689-BE5D-A59713B86567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{397C7C4D-BDDE-4689-BE5D-A59713B86567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{397C7C4D-BDDE-4689-BE5D-A59713B86567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7B1343E-A259-46C5-81B5-41D431D12D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7B1343E-A259-46C5-81B5-41D431D12D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7B1343E-A259-46C5-81B5-41D431D12D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B1343E-A259-46C5-81B5-41D431D12D3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9824E754-D2B3-44AD-AC8F-82C8AFDDF89C}
+	EndGlobalSection
+EndGlobal
